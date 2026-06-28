@@ -2,6 +2,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartaCard from "@/components/CartaCard";
+import BotonesAnimo from "@/components/BotonesAnimo";
 import { supabase, type Carta } from "@/lib/supabase";
 
 async function getCartasRecientes(): Promise<Carta[]> {
@@ -129,6 +130,9 @@ export default async function HomePage() {
             </div>
           </section>
         )}
+
+        {/* Botones de ánimo */}
+        <BotonesAnimo />
 
         {/* Días especiales */}
         <section className="py-14 px-6 max-w-3xl mx-auto">
