@@ -1,65 +1,203 @@
-import Image from "next/image";
+import Link from "next/link";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import CartaCard from "@/components/CartaCard";
+import { supabase, type Carta } from "@/lib/supabase";
 
-export default function Home() {
+async function getCartasRecientes(): Promise<Carta[]> {
+  const { data } = await supabase
+    .from("cartas")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(6);
+  return data ?? [];
+}
+
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const cartas = await getCartasRecientes();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="flex flex-col min-h-screen">
+      <Header />
+
+      <main className="flex-1">
+        {/* Hero */}
+        <section
+          className="relative py-24 px-6 text-center overflow-hidden"
+          style={{ backgroundColor: "var(--rose-light)" }}
+        >
+          <div className="absolute inset-0 opacity-20 pointer-events-none select-none flex items-center justify-center">
+            <span className="text-[20rem] leading-none">🕊️</span>
+          </div>
+          <div className="relative max-w-2xl mx-auto animate-float-up">
+            <p
+              className="text-xs tracking-widest uppercase font-light mb-4"
+              style={{ color: "var(--rose-warm)" }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              Un espacio para despedirse con amor
+            </p>
+            <h1
+              className="text-4xl md:text-5xl font-serif font-medium mb-6 leading-tight"
+              style={{ color: "var(--text-dark)" }}
             >
-              Learning
-            </a>{" "}
-            center.
+              Cartas para el Cielo
+            </h1>
+            <p
+              className="text-lg font-light leading-relaxed mb-8"
+              style={{ color: "var(--text-mid)" }}
+            >
+              Un espacio gratuito donde puedes escribirle una carta a quien ya
+              no está. No necesitas registrarte. Solo necesitas amor.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/escribir"
+                className="px-8 py-3 rounded-full text-white font-medium text-sm tracking-wide transition-all hover:opacity-90 shadow-sm"
+                style={{ backgroundColor: "var(--rose-warm)" }}
+              >
+                Escribir mi carta
+              </Link>
+              <Link
+                href="/cartas"
+                className="px-8 py-3 rounded-full font-medium text-sm tracking-wide border transition-all hover:opacity-80"
+                style={{
+                  borderColor: "var(--rose-mid)",
+                  color: "var(--text-mid)",
+                  backgroundColor: "white",
+                }}
+              >
+                Leer cartas
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Texto de contexto */}
+        <section className="py-16 px-6 max-w-2xl mx-auto text-center">
+          <div
+            className="w-12 h-px mx-auto mb-8"
+            style={{ backgroundColor: "var(--rose-mid)" }}
+          />
+          <p
+            className="text-base font-light leading-loose"
+            style={{ color: "var(--text-mid)" }}
+          >
+            Este espacio nació del dolor y del amor. Para los que perdieron
+            seres queridos en el{" "}
+            <span style={{ color: "var(--text-dark)" }} className="font-medium">
+              terremoto de Venezuela
+            </span>{" "}
+            y para todos los que cargan el peso de una despedida que nunca
+            llegó a tiempo. Aquí, las palabras no se pierden — suben.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          <div
+            className="w-12 h-px mx-auto mt-8"
+            style={{ backgroundColor: "var(--rose-mid)" }}
+          />
+        </section>
+
+        {/* Cartas recientes */}
+        {cartas.length > 0 && (
+          <section className="py-12 px-6 max-w-4xl mx-auto">
+            <h2
+              className="text-2xl font-serif text-center mb-10"
+              style={{ color: "var(--text-dark)" }}
+            >
+              Cartas recientes
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {cartas.map((carta) => (
+                <CartaCard key={carta.id} carta={carta} />
+              ))}
+            </div>
+            {cartas.length >= 6 && (
+              <div className="text-center mt-10">
+                <Link
+                  href="/cartas"
+                  className="text-sm font-medium underline underline-offset-4"
+                  style={{ color: "var(--rose-warm)" }}
+                >
+                  Ver todas las cartas →
+                </Link>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* CTA vacío */}
+        {cartas.length === 0 && (
+          <section className="py-16 px-6 text-center max-w-lg mx-auto">
+            <div className="text-5xl mb-6">✉️</div>
+            <p
+              className="text-lg font-light mb-6"
+              style={{ color: "var(--text-mid)" }}
+            >
+              Aún no hay cartas. Sé el primero en escribir.
+            </p>
+            <Link
+              href="/escribir"
+              className="px-8 py-3 rounded-full text-white font-medium text-sm shadow-sm hover:opacity-90 transition-all"
+              style={{ backgroundColor: "var(--rose-warm)" }}
+            >
+              Escribir la primera carta
+            </Link>
+          </section>
+        )}
+
+        {/* Cómo funciona */}
+        <section
+          className="py-16 px-6"
+          style={{ backgroundColor: "var(--rose-light)" }}
+        >
+          <div className="max-w-3xl mx-auto">
+            <h2
+              className="text-2xl font-serif text-center mb-12"
+              style={{ color: "var(--text-dark)" }}
+            >
+              ¿Cómo funciona?
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8 text-center">
+              {[
+                {
+                  emoji: "✍️",
+                  title: "Escribe",
+                  desc: "Llena un formulario sencillo con tu nombre, el nombre de quien fue, y tu mensaje.",
+                },
+                {
+                  emoji: "🕊️",
+                  title: "Se publica",
+                  desc: "Tu carta aparece públicamente para que otros también puedan leerla y sentirse acompañados.",
+                },
+                {
+                  emoji: "💛",
+                  title: "Sana",
+                  desc: "Escribir es un acto de amor. El duelo necesita palabras. Este es tu espacio.",
+                },
+              ].map(({ emoji, title, desc }) => (
+                <div key={title} className="flex flex-col items-center gap-3">
+                  <div className="text-4xl">{emoji}</div>
+                  <h3
+                    className="font-serif text-lg"
+                    style={{ color: "var(--text-dark)" }}
+                  >
+                    {title}
+                  </h3>
+                  <p
+                    className="text-sm font-light leading-relaxed"
+                    style={{ color: "var(--text-mid)" }}
+                  >
+                    {desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
+
+      <Footer />
     </div>
   );
 }
