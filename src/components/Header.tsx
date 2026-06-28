@@ -33,6 +33,15 @@ export default function Header() {
             Leer cartas
           </Link>
           <Link
+            href="/recursos"
+            className="text-sm font-light tracking-wide transition-colors"
+            style={{
+              color: pathname === "/recursos" ? "var(--rose-warm)" : "var(--text-mid)",
+            }}
+          >
+            Ayuda
+          </Link>
+          <Link
             href="/escribir"
             className="text-sm px-5 py-2 rounded-full transition-all font-medium"
             style={{
