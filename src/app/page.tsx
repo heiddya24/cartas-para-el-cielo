@@ -130,6 +130,48 @@ export default async function HomePage() {
           </section>
         )}
 
+        {/* Días especiales */}
+        <section className="py-14 px-6 max-w-3xl mx-auto">
+          <h2
+            className="text-2xl font-serif text-center mb-3"
+            style={{ color: "var(--text-dark)" }}
+          >
+            Días que duelen más
+          </h2>
+          <p
+            className="text-sm font-light text-center mb-8"
+            style={{ color: "var(--text-mid)" }}
+          >
+            Algunos días el peso se siente más. Si hoy es uno de esos días,
+            escríbele.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {[
+              { emoji: "🎂", label: "Su cumpleaños", id: "cumpleanos" },
+              { emoji: "💐", label: "Día de las madres", id: "madres" },
+              { emoji: "👔", label: "Día del padre", id: "padre" },
+              { emoji: "🎄", label: "Navidad", id: "navidad" },
+              { emoji: "💑", label: "Aniversario", id: "aniversario" },
+              { emoji: "🕊️", label: "Otro día difícil", id: "dificil" },
+            ].map(({ emoji, label, id }) => (
+              <a
+                key={id}
+                href={`/escribir?ocasion=${id}`}
+                className="rounded-2xl p-5 text-center border border-rose-100 transition-all hover:shadow-sm hover:border-rose-200 flex flex-col items-center gap-2"
+                style={{ backgroundColor: "var(--soft-white)" }}
+              >
+                <span className="text-3xl">{emoji}</span>
+                <span
+                  className="text-sm font-light"
+                  style={{ color: "var(--text-mid)" }}
+                >
+                  {label}
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+
         {/* Texto de contexto */}
         <section className="py-16 px-6 max-w-2xl mx-auto text-center">
           <div

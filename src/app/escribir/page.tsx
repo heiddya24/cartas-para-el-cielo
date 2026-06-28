@@ -1,9 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+
+const MENSAJES_OCASION: Record<string, string> = {
+  cumpleanos: "Hoy puede ser su cumpleaños, y eso puede hacer que lo extrañes más. Si quieres, escríbele unas palabras y envíalas al cielo.",
+  madres: "El Día de las Madres puede sentirse muy diferente cuando ella ya no está. Si quieres, escríbele unas palabras y envíalas al cielo.",
+  padre: "El Día del Padre puede ser un día especialmente difícil. Si quieres, escríbele unas palabras y envíalas al cielo.",
+  navidad: "La Navidad sin esa persona puede doler de una manera muy profunda. Si quieres, escríbele unas palabras y envíalas al cielo.",
+  aniversario: "Los aniversarios nos recuerdan lo que fue y lo que extrañamos. Si quieres, escríbele unas palabras y envíalas al cielo.",
+  dificil: "Hoy puede ser un día especialmente difícil. Si quieres, escríbele unas palabras y envíalas al cielo.",
+};
 
 const FRASES_CRISIS = [
   "me quiero quitar la vida",
@@ -45,10 +54,19 @@ function detectarCrisis(texto: string): boolean {
 
 export default function EscribirPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [form, setForm] = useState({ de: "", para: "", mensaje: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [mostrarAlertaCrisis, setMostrarAlertaCrisis] = useState(false);
+  const [mensajeOcasion, setMensajeOcasion] = useState("");
+
+  useEffect(() => {
+    const ocasion = searchParams.get("ocasion");
+    if (ocasion && MENSAJES_OCASION[ocasion]) {
+      setMensajeOcasion(MENSAJES_OCASION[ocasion]);
+    }
+  }, [searchParams]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -156,6 +174,21 @@ export default function EscribirPage() {
               >
                 Si deseas, puedes editar tu carta y enviarla cuando te sientas
                 listo.
+              </p>
+            </div>
+          )}
+
+          {/* Mensaje de día especial */}
+          {mensajeOcasion && (
+            <div
+              className="rounded-2xl p-5 mb-2 text-center border border-rose-100"
+              style={{ backgroundColor: "var(--rose-light)" }}
+            >
+              <p
+                className="text-base font-serif italic leading-relaxed"
+                style={{ color: "var(--text-dark)" }}
+              >
+                {mensajeOcasion}
               </p>
             </div>
           )}
