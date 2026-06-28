@@ -13,10 +13,24 @@ async function getCartasRecientes(): Promise<Carta[]> {
   return data ?? [];
 }
 
+async function getEstadisticas(): Promise<{ totalCartas: number; totalPalabras: number }> {
+  const { data } = await supabase.from("cartas").select("mensaje");
+  if (!data) return { totalCartas: 0, totalPalabras: 0 };
+  const totalCartas = data.length;
+  const totalPalabras = data.reduce((acc, c) => {
+    return acc + c.mensaje.trim().split(/\s+/).filter(Boolean).length;
+  }, 0);
+  return { totalCartas, totalPalabras };
+}
+
+function formatNum(n: number): string {
+  return n.toLocaleString("es-ES");
+}
+
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const cartas = await getCartasRecientes();
+  const [cartas, stats] = await Promise.all([getCartasRecientes(), getEstadisticas()]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -73,6 +87,48 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* Contador */}
+        {stats.totalCartas > 0 && (
+          <section className="py-12 px-6">
+            <div className="max-w-2xl mx-auto grid grid-cols-2 gap-6">
+              <div
+                className="rounded-2xl p-6 text-center border border-rose-100"
+                style={{ backgroundColor: "var(--soft-white)" }}
+              >
+                <p
+                  className="text-4xl font-serif font-medium mb-2"
+                  style={{ color: "var(--rose-warm)" }}
+                >
+                  {formatNum(stats.totalCartas)}
+                </p>
+                <p
+                  className="text-sm font-light leading-relaxed"
+                  style={{ color: "var(--text-mid)" }}
+                >
+                  cartas enviadas al cielo
+                </p>
+              </div>
+              <div
+                className="rounded-2xl p-6 text-center border border-rose-100"
+                style={{ backgroundColor: "var(--soft-white)" }}
+              >
+                <p
+                  className="text-4xl font-serif font-medium mb-2"
+                  style={{ color: "var(--rose-warm)" }}
+                >
+                  {formatNum(stats.totalPalabras)}
+                </p>
+                <p
+                  className="text-sm font-light leading-relaxed"
+                  style={{ color: "var(--text-mid)" }}
+                >
+                  palabras que necesitaban salir del pecho
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Texto de contexto */}
         <section className="py-16 px-6 max-w-2xl mx-auto text-center">
