@@ -5,21 +5,70 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+const FRASES_CRISIS = [
+  "me quiero quitar la vida",
+  "quiero quitarme la vida",
+  "ya no quiero vivir",
+  "no quiero vivir más",
+  "no quiero vivir mas",
+  "quiero morirme",
+  "me quiero morir",
+  "quiero morir",
+  "voy a suicidarme",
+  "me voy a suicidar",
+  "voy a hacerme daño",
+  "me voy a hacer daño",
+  "se que pronto me ire contigo",
+  "sé que pronto me iré contigo",
+  "pronto estaré contigo",
+  "pronto estare contigo",
+  "no vale la pena seguir viviendo",
+  "no tiene sentido seguir viviendo",
+  "prefiero no estar aquí",
+  "prefiero no estar aqui",
+  "mejor me voy con él",
+  "mejor me voy con ella",
+  "mejor me voy con ellos",
+  "ya no quiero estar aquí",
+  "ya no quiero estar aqui",
+  "cansado de vivir",
+  "cansada de vivir",
+];
+
+function detectarCrisis(texto: string): boolean {
+  const textoNorm = texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  return FRASES_CRISIS.some((frase) => {
+    const fraseNorm = frase.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    return textoNorm.includes(fraseNorm);
+  });
+}
+
 export default function EscribirPage() {
   const router = useRouter();
   const [form, setForm] = useState({ de: "", para: "", mensaje: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mostrarAlertaCrisis, setMostrarAlertaCrisis] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  ) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (e.target.name === "mensaje" && mostrarAlertaCrisis) {
+      if (!detectarCrisis(e.target.value)) setMostrarAlertaCrisis(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
+    if (detectarCrisis(form.mensaje)) {
+      setMostrarAlertaCrisis(true);
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await fetch("/api/cartas", {
         method: "POST",
@@ -58,6 +107,58 @@ export default function EscribirPage() {
               escribas, con amor.
             </p>
           </div>
+
+          {/* Alerta de crisis */}
+          {mostrarAlertaCrisis && (
+            <div
+              className="rounded-2xl p-6 mb-6 border"
+              style={{
+                backgroundColor: "#fff8f0",
+                borderColor: "#e8c4a0",
+              }}
+            >
+              <p
+                className="text-lg font-serif mb-3"
+                style={{ color: "#8b4513" }}
+              >
+                💛 Gracias por escribir esto.
+              </p>
+              <p
+                className="text-sm font-light leading-relaxed mb-4"
+                style={{ color: "#7a5c3a" }}
+              >
+                Lo que estás viviendo puede sentirse insoportable, pero no
+                tienes que atravesarlo solo. Si sientes que estás en peligro,
+                o que podrías hacerte daño, por favor busca apoyo inmediato —
+                de alguien de confianza o los servicios de emergencia de tu
+                país.
+              </p>
+              <p
+                className="text-sm font-light leading-relaxed mb-4"
+                style={{ color: "#7a5c3a" }}
+              >
+                Tu vida tiene valor. Estamos aquí para escucharte, pero en
+                este momento necesitas más que una carta — necesitas una mano
+                de verdad.
+              </p>
+              <div
+                className="rounded-xl p-4 text-sm font-light"
+                style={{ backgroundColor: "#fdebd0", color: "#8b4513" }}
+              >
+                <p className="font-medium mb-2">Líneas de ayuda:</p>
+                <p>🇻🇪 Venezuela: <strong>0800-SALUD-00</strong></p>
+                <p>🇺🇸 USA: <strong>988</strong> (Suicide & Crisis Lifeline)</p>
+                <p>🌎 Internacional: <strong>findahelpline.com</strong></p>
+              </div>
+              <p
+                className="text-xs mt-4 font-light"
+                style={{ color: "#b09070" }}
+              >
+                Si deseas, puedes editar tu carta y enviarla cuando te sientas
+                listo.
+              </p>
+            </div>
+          )}
 
           <form
             onSubmit={handleSubmit}
@@ -135,6 +236,7 @@ export default function EscribirPage() {
                 style={{
                   backgroundColor: "var(--cream)",
                   color: "var(--text-dark)",
+                  borderColor: mostrarAlertaCrisis ? "#e8c4a0" : undefined,
                 }}
               />
               <p
