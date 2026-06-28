@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AnimacionEnvio from "@/components/AnimacionEnvio";
 
 const MENSAJES_OCASION: Record<string, string> = {
   cumpleanos: "Hoy puede ser su cumpleaños, y eso puede hacer que lo extrañes más. Si quieres, escríbele unas palabras y envíalas al cielo.",
@@ -41,6 +42,7 @@ function FormularioInner() {
   const [error, setError] = useState("");
   const [mostrarAlertaCrisis, setMostrarAlertaCrisis] = useState(false);
   const [mensajeOcasion, setMensajeOcasion] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
     const ocasion = searchParams.get("ocasion");
@@ -69,7 +71,7 @@ function FormularioInner() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error al enviar la carta.");
-      router.push("/gracias");
+      setEnviando(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error inesperado.");
     } finally {
@@ -78,6 +80,8 @@ function FormularioInner() {
   };
 
   return (
+    <>
+    {enviando && <AnimacionEnvio />}
     <div className="max-w-xl mx-auto">
       <div className="text-center mb-10">
         <span className="text-4xl">✉️</span>
@@ -160,6 +164,7 @@ function FormularioInner() {
         </p>
       </form>
     </div>
+    </>
   );
 }
 
